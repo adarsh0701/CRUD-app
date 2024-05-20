@@ -57,6 +57,15 @@ app.get('/users/:id', async (request, response) => {
   const user = await User.findById(request.params.id);
   response.status(200).json(user);
 });
+app.put('/users/:id', async (request, response) => {
+  const userId = request.params.id;
+  const user = await User.findById(userId);
+  user.name = request.body.name;
+  user.email = request.body.email;
+  user.age = request.body.age;
+  const updatedItem = await user.save();
+  response.status(200).json(updatedItem);
+});
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

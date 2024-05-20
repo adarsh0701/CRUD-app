@@ -16,8 +16,8 @@
 <body>
 
     <div class="container">
-        <h1 class="text-center mb-5 mt-5 text-danger"><b>Build a CRUD App with Node.js and MongoDB - Insert Data into
-                MongoDB Database - 2</b></h1>
+        <h1 class="text-center mb-5 mt-5 text-danger"><b>Build a CRUD App with Node.js and MongoDB - Delete Data from
+                MongoDB Database - 5</b></h1>
         <div class="card mb-5">
             <div class="card-header">
                 <div class="row">
@@ -39,8 +39,7 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="dataArea">
-                        </tbody>
+                        <tbody id="dataArea"></tbody>
                     </table>
                 </div>
             </div>
@@ -60,56 +59,55 @@
 
     function makeModal(title, button_value, callback) {
         let html = `
-<div class="modal" tabindex="-1" id="userModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="userform">
-                <div class="modal-header">
-                    <h5 class="modal-title">${title}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Name</label>
-                        <input type="text" name="name" id="name" class="form-control" />
+    <div class="modal" tabindex="-1" id="userModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="userform">
+                    <div class="modal-header">
+                        <h5 class="modal-title">${title}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="mb-3">
-                        <label>Email</label>
-                        <input type="email" name="email" id="email" class="form-control" />
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label>Name</label>
+                            <input type="text" name="name" id="name" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label>Email</label>
+                            <input type="email" name="email" id="email" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label>Age</label>
+                            <input type="number" name="age" id="age" class="form-control" />
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label>Age</label>
-                        <input type="number" name="age" id="age" class="form-control" />
+                    <div class="modal-footer">
+                        <input type="hidden" name="user_id" id="user_id" />
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="${callback}()">${button_value}</button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" name="user_id" id="user_id" />
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="${callback}()">${button_value}</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-`;
+    `;
 
         document.querySelector('#modalArea').innerHTML = html;
 
         userModalElement = new bootstrap.Modal(document.getElementById('userModal'));
 
         userModalElement.show();
-
     }
 
     function insertData() {
         let formElement = document.getElementById('userform');
-        const formdata = new FormData(formElement);
-        //convert formdata to JSON
+        const formData = new FormData(formElement);
+        // Convert formData to JSON
         const jsonData = {};
-        formdata.forEach((value, key) => {
+        formData.forEach((value, key) => {
             jsonData[key] = value;
-        })
-        // make a post request using fetch API
+        });
+        // Make a POST request using Fetch API
         fetch('/users', {
             method: 'POST',
             body: JSON.stringify(jsonData),
@@ -123,34 +121,32 @@
             .then(data => {
                 userModalElement.hide();
                 getData();
-            })
-            ;
-
+            });
     }
 
     getData();
+
     function getData() {
-        fetch('./users')
+        fetch('/users')
             .then(response => {
                 return response.json();
             })
             .then(data => {
-                let html = ''
+                let html = '';
                 if (data.length > 0) {
                     data.map((row) => {
                         html += `
-                        <tr>
-                            <td>${row.name}</td>
-                            <td>${row.email}</td>
-                            <td>${row.age}</td>
-                            <td>
-                                <button type="button" class="btn btn-warning btn-sm" onclick="fetchSingleData('${row._id}')">Edit</button>
-                            </td>
-                        </tr>
-                        `;
+                <tr>
+                    <td>${row.name}</td>
+                    <td>${row.email}</td>
+                    <td>${row.age}</td>
+                    <td>
+                        <button type="button" class="btn btn-warning btn-sm" onclick="fetchSingleData('${row._id}')">Edit</button>
+                    </td>
+                </tr>
+                `;
                     });
-                }
-                else {
+                } else {
                     html = '<tr><td colspan="4" class="text-center">No Data Found</td></tr>';
                 }
                 document.getElementById('dataArea').innerHTML = html;
@@ -170,6 +166,7 @@
                 document.getElementById('user_id').value = data._id;
             });
     }
+
     function editData() {
         let formElement = document.getElementById('userform');
         const formData = new FormData(formElement);
@@ -177,5 +174,21 @@
         formData.forEach((value, key) => {
             jsonData[key] = value;
         });
+        const userId = document.getElementById('user_id').value;
+        fetch(`/users/${userId}`, {
+            method: 'PUT',
+            body: JSON.stringify(jsonData),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                userModalElement.hide();
+                getData();
+            });
     }
+
 </script>

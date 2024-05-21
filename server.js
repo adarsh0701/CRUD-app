@@ -66,6 +66,13 @@ app.put('/users/:id', async (request, response) => {
   const updatedItem = await user.save();
   response.status(200).json(updatedItem);
 });
+app.delete('/users/:id', async (request, response) => {
+  const userId = request.params.id;
+  // Fetch the user from the database
+  const user = await User.findById(userId);
+  await user.deleteOne();
+  response.status(200).json({ message: 'Deleted item' });
+});
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

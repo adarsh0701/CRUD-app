@@ -142,6 +142,8 @@
                     <td>${row.age}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm" onclick="fetchSingleData('${row._id}')">Edit</button>
+                    
+                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteData('${row._id}')">Delete</button>
                     </td>
                 </tr>
                 `;
@@ -189,6 +191,22 @@
                 userModalElement.hide();
                 getData();
             });
+    }
+    function deleteData(id) {
+        if (confirm("Are you sure you want to delete this?")) {
+            fetch(`/users/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    getData();
+                })
+        }
     }
 
 </script>
